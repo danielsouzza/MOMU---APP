@@ -1,6 +1,5 @@
 package com.example.momu.repository
 
-import android.util.Log
 import com.example.momu.data.api.ApiService
 import com.example.momu.data.api.TokenManager
 import com.example.momu.data.models.UserResponse
@@ -20,37 +19,19 @@ class AuthRepository(private val apiService: ApiService) {
                 TokenManager.saveToken(token)
                 return@withContext token
             } else {
-                Log.d("AuthRepository", "Token não encontrado")
                 throw Exception("Token não encontrado")
             }
-
         } else {
-            Log.d("AuthRepository", "Erro ao fazer login: ${response.errorBody()?.string()}")
             throw Exception("Erro ao fazer login")
         }
     }
 
     suspend fun getUser(): UserResponse = withContext(Dispatchers.IO) {
         val response = apiService.api.getUser()
-        if (response.isSuccessful) {
-            response.body() ?: throw Exception("Usuário não encontrado")
+        (if (response.isSuccessful) {
+            response.body()
         } else {
             throw Exception("Erro ao buscar dados do usuário")
-        }
-    }
-
-
-    // Método para trocar o papel (role)
-    suspend fun switchRole(role: String): Result<Unit> = withContext(Dispatchers.IO) {
-        try {
-            val response = apiService.api.switchRole(role)
-            if (response.isSuccessful) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("Erro ao trocar de role"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        })!!
     }
 }
