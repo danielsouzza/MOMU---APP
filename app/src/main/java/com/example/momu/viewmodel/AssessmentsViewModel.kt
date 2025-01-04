@@ -20,7 +20,7 @@ class AssessmentViewModel @Inject constructor(
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val _assessmentsState = MutableStateFlow(AssessmentsState())
+    private val _assessmentsState = MutableStateFlow<AssessmentsState>(AssessmentsState.Loading)
     val assessmentsState: StateFlow<AssessmentsState> = _assessmentsState
 
     private val _assessmentDetailState = MutableStateFlow<AssessmentDetailState>(AssessmentDetailState.Loading)
@@ -33,19 +33,20 @@ class AssessmentViewModel @Inject constructor(
 
     private fun fetchAssessments() {
         viewModelScope.launch {
+            _assessmentsState.value = AssessmentsState.Loading
             try {
                 val response = apiService.api.getAssessments()
                 if (response.isSuccessful) {
                     val data = response.body()
-                    _assessmentsState.value = AssessmentsState(
+                    _assessmentsState.value = AssessmentsState.Success(
                         grouped = data?.grouped ?: emptyList(),
                         ungrouped = data?.ungrouped ?: emptyList()
                     )
                 } else {
-                    _assessmentsState.value = AssessmentsState(error = "Erro ao buscar avaliações")
+                    _assessmentsState.value = AssessmentsState.Error("Erro ao buscar avaliações")
                 }
             } catch (e: Exception) {
-                _assessmentsState.value = AssessmentsState(error = "Erro ao conectar")
+                _assessmentsState.value = AssessmentsState.Error("Erro ao conectar")
             }
         }
     }
@@ -81,8 +82,11 @@ sealed class AssessmentDetailState {
     data class Error(val message: String) : AssessmentDetailState()
 }
 
-data class AssessmentsState(
-    val grouped: List<AssessmentGroupedResponse> = emptyList(),
-    val ungrouped: List<AssessmentResponse> = emptyList(),
-    val error: String? = null
-)
+sealed class AssessmentsState {
+    object Loading : AssessmentsState()
+    data class Success(
+        val grouped: List<AssessmentGroupedResponse>,
+        val ungrouped: List<AssessmentResponse>
+    ) : AssessmentsState()
+    data class Error(val message: String) : AssessmentsState()
+}

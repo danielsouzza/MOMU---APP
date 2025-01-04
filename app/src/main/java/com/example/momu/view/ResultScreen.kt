@@ -74,7 +74,6 @@ fun ResultScreen(
         viewModel.fetchResultAssessment(assessmentIdState.intValue)
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
