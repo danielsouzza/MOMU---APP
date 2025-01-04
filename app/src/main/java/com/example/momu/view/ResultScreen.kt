@@ -245,7 +245,7 @@ fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
                 lineColor = Color.Transparent,
                 categoryOptions = DataCategorySettings(
                     isYAxisCategory = true,
-                    startsFromBottom = true
+                    startsFromBottom = false
                 ),
                 initialDrawPadding = 16.dp,
                 labelFormatter = { index ->
