@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
 object ApiService {
-    private const val BASE_URL = "http://192.168.1.13:8000/api/"
+    private const val BASE_URL = "https://momu.com.br/api/"
 
     private val client = OkHttpClient.Builder()
         .addInterceptor { chain ->
