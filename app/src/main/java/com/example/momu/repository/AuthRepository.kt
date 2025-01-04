@@ -12,7 +12,6 @@ import android.os.Build
 class AuthRepository(private val apiService: ApiService) {
 
 
-
     suspend fun login(email: String, password: String): String = withContext(Dispatchers.IO) {
         val response = apiService.api.login(LoginRequest(email, password, Build.MODEL))
         if (response.isSuccessful) {

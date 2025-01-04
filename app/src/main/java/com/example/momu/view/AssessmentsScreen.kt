@@ -1,6 +1,7 @@
 package com.example.momu.view
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,7 +30,7 @@ fun AssessmentListScreen(
     val assessmentsState by viewModel.assessmentsState.collectAsState()
 
     IconButton(
-        onClick = { navController.popBackStack() }, // Navega de volta à tela anterior
+        onClick = { navController.popBackStack() },
         modifier = Modifier.padding(16.dp)
     ) {
         Icon(
@@ -55,19 +56,20 @@ fun AssessmentListScreen(
                     )
                 }
             }
+
             assessmentsState.ungrouped.isNotEmpty() -> {
-
                 items(assessmentsState.ungrouped) { assessment ->
-                    AssessmentCard(assessment)
+                    AssessmentCard(assessment){ selectedAssessment ->
+                        navController.navigate("result/${selectedAssessment.id}")
+                    }
                 }
             }
-            assessmentsState.grouped.isNotEmpty() -> {
 
+            assessmentsState.grouped.isNotEmpty() -> {
                 items(assessmentsState.grouped) { group ->
-                    GroupedAssessmentCard(group)
+                    GroupedAssessmentCard(group, navController = navController)
                 }
-            }
-            else -> {
+            } else -> {
                 item {
                     Text(
                         text = "Nenhuma avaliação disponível.",
@@ -77,60 +79,71 @@ fun AssessmentListScreen(
             }
         }
     }
-
-
 }
 
-@Composable
-fun GroupedAssessmentCard(group: AssessmentGroupedResponse) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.elevatedCardElevation(4.dp)
+    @Composable
+    fun GroupedAssessmentCard(
+        group: AssessmentGroupedResponse,
+        navController: NavController
     ) {
-        Column(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(8.dp),
+            elevation = CardDefaults.elevatedCardElevation(4.dp)
         ) {
-            // Header com nome do curso, semestre e bolinhas para avaliações
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // Nome do curso
-                Text(
-                    text = "Curso: ${group.course_name}",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(end = 16.dp)
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                // Header com nome do curso, semestre e bolinhas para avaliações
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Nome do curso
+                    Text(
+                        text = "Curso: ${group.course_name}",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(end = 16.dp)
+                    )
 
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                // Informações sobre o semestre e as datas
-                Text(
-                    text = "Semestre: ${group.period.semester} - ${group.period.date_start} até ${group.period.date_end}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+                    // Informações sobre o semestre e as datas
+                    Text(
+                        text = "Semestre: ${group.period.semester} - ${group.period.date_start} até ${group.period.date_end}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            // Loop para as avaliações, com cada avaliação sendo um card
-            group.assessments.forEach { assessment ->
-                AssessmentCard(assessment)
+                // Loop para as avaliações, com cada avaliação sendo um card
+                group.assessments.forEach { assessment ->
+                    AssessmentCard(
+                        assessment,
+                        onClick = { selectedAssessment ->
+                            navController.navigate("result/${selectedAssessment.id}")
+                        }
+                    )
+                }
             }
         }
     }
-}
-
 
 @Composable
-fun AssessmentCard(assessment: AssessmentResponse) {
+fun AssessmentCard(
+    assessment: AssessmentResponse,
+    onClick: (AssessmentResponse) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable {
+                onClick(assessment)
+            },
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.elevatedCardElevation(2.dp)
     ) {

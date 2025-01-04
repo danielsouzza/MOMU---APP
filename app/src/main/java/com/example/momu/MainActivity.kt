@@ -10,15 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.momu.data.api.ApiService
 import com.example.momu.data.api.TokenManager
 import com.example.momu.repository.AuthRepository
 import com.example.momu.ui.theme.MOMUTheme
 import com.example.momu.view.AssessmentListScreen
 import com.example.momu.view.LoginScreen
+import com.example.momu.view.ResultScreen
 import com.example.momu.view.RoleSelectionOrAssessmentListScreen
 import com.example.momu.viewmodel.AssessmentViewModel
 import com.example.momu.viewmodel.LoginViewModel
@@ -41,14 +44,21 @@ class MainActivity : ComponentActivity() {
                     } }
                     composable("home") {
                         val roleViewModel = RoleViewModel(ApiService)
-                        RoleSelectionOrAssessmentListScreen(navController,roleViewModel)
+                        RoleSelectionOrAssessmentListScreen(navController, roleViewModel)
                     }
                     composable("assessmentList") {
                         val assessmentsViewModel = AssessmentViewModel(ApiService)
-                        AssessmentListScreen(navController,assessmentsViewModel)
+                        AssessmentListScreen(navController, assessmentsViewModel)
+                    }
+                    composable(
+                        route = "result/{assessmentId}",
+                        arguments = listOf(navArgument("assessmentId") { type = NavType.IntType })
+                    ) { backStackEntry ->
+                        val assessmentId = backStackEntry.arguments?.getInt("assessmentId") ?: -1
+                        val assessmentsViewModel = AssessmentViewModel(ApiService)
+                        ResultScreen(navController, assessmentId, assessmentsViewModel)
                     }
                 }
-
             }
         }
     }
