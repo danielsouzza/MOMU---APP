@@ -60,7 +60,7 @@ interface ApiEndpoints {
     suspend fun getConsolidatedResults(
         @Path("course_id") courseId: Int,
         @Path("period_id") periodId: Int
-    ): Response<ConsolidatedResultsResponse>  // Modificado para Response
+    ): Response<ConsolidatedResultsResponse>
 
     @POST("switch-role/{role}")
     suspend fun switchRole(@Path("role") role: String): Response<SwitchRoleResponse>
