@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.momu"
+    namespace = "com.joaobembe.momu"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.momu"
+        applicationId = "com.joaobembe.momu"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
