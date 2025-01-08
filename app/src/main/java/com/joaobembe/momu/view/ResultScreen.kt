@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,6 +15,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -189,45 +192,60 @@ fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
 
         assessment?.let {
             Log.d("UI", "Rendering Success state with data: $it")
-            RadarChart(
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp),
-                radarChartConfig = RadarChartConfig(
-                    sideLength = it.chart.labels.size,
-                    maxLabelWidth = 25.dp,
-                    scaleStepsCount = 5,
-                    radarChartDataSet = listOf(
-                        RadarChartDataSet(
-                            style = RadarChartDataSetStyle(
-                                color = Color(0xFF6495ED),
-                                borderColor = Color(0xFF00008B),
-                                colorAlpha = 0.1f,
-                                strokeCap = StrokeCap.Butt,
-                                strokeWidth = 5.0f,
-                            ), data = it.chart.scores
-                        ),
-                    ),
-                    radarChartLineStyle = RadarChartLineStyle(
-                        color = Color.Gray,
-                        strokeCap = StrokeCap.Butt,
-                        strokeWidth = 1f
-                    ),
-                    scaleTextStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 11.sp,
-
-                        ),
-                    labelTextStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 12.sp,
-
-                        ),
-                    maxScaleValue = 100.0,
-                    scaleUnit = "",
-                    radarSegmentsLabels = it.chart.labels,
+                    .fillMaxHeight(0.5f)
+                    .padding(16.dp),
+            ) {
+                Text(
+                    text = "Avaliação por dimensão",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
                 )
-            )
+                RadarChart(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(350.dp),
+                    radarChartConfig = RadarChartConfig(
+                        sideLength = it.chart.labels.size,
+                        maxLabelWidth = 25.dp,
+                        scaleStepsCount = 5,
+                        radarChartDataSet = listOf(
+                            RadarChartDataSet(
+                                style = RadarChartDataSetStyle(
+                                    color = Color(0xFF6495ED),
+                                    borderColor = Color(0xFF00008B),
+                                    colorAlpha = 0.1f,
+                                    strokeCap = StrokeCap.Butt,
+                                    strokeWidth = 5.0f,
+                                ), data = it.chart.scores
+                            ),
+                        ),
+                        radarChartLineStyle = RadarChartLineStyle(
+                            color = Color.Gray,
+                            strokeCap = StrokeCap.Butt,
+                            strokeWidth = 1f
+                        ),
+                        scaleTextStyle = TextStyle(
+                            color = Color.Black,
+                            fontSize = 11.sp,
+
+                            ),
+                        labelTextStyle = TextStyle(
+                            color = Color.Black,
+                            fontSize = 12.sp,
+
+                            ),
+                        maxScaleValue = 100.0,
+                        scaleUnit = "",
+                        radarSegmentsLabels = it.chart.labels,
+                    )
+                )
+            }
+
 
             val barData = getBarChartData(
                 BarChartType.HORIZONTAL,

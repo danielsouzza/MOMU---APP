@@ -39,8 +39,6 @@ class AuthRepository(private val apiService: ApiService) {
         }
     }
 
-
-    // Método para trocar o papel (role)
     suspend fun switchRole(role: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.api.switchRole(role)

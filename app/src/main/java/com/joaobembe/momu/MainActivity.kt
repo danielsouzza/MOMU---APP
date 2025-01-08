@@ -39,9 +39,11 @@ class MainActivity : ComponentActivity() {
 
 
                 NavHost(navController = navController, startDestination = startDestination) {
-                    composable("login") { LoginScreen(loginViewModel){
-
-                    } }
+                    composable("login") {
+                        LoginScreen(loginViewModel){
+                            navController.navigate("home")
+                        }
+                    }
                     composable("home") {
                         val roleViewModel = RoleViewModel(ApiService)
                         RoleSelectionOrAssessmentListScreen(navController, roleViewModel)
