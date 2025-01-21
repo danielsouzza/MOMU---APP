@@ -17,19 +17,14 @@ class RoleViewModel @Inject constructor(
     private val apiService: ApiService
 ) : ViewModel() {
 
-
-
     private val _rolesState = MutableStateFlow(RolesState(isLoading = true))
     val rolesState: StateFlow<RolesState> = _rolesState
-
-
 
     init {
         fetchRoles()
     }
 
     private fun fetchRoles() {
-        // Indicar que o carregamento começou
         _rolesState.value = RolesState(isLoading = true)
 
         viewModelScope.launch {
@@ -39,20 +34,17 @@ class RoleViewModel @Inject constructor(
                     val user = response.body()
                     _rolesState.value = RolesState(user = user, roles = user?.roles, isLoading = false)
                 } else {
-                    // Tratar erros da API
                     _rolesState.value = RolesState(
                         error = "Erro: ${response.code()} - ${response.message()}",
                         isLoading = true
                     )
                 }
             } catch (e: Exception) {
-                // Tratar exceções (ex.: falta de conexão)
                 _rolesState.value = RolesState(error = "Erro ao buscar roles", isLoading = true)
                 Log.e("FetchRoles", "Erro ao buscar roles", e)
             }
         }
     }
-
 
     fun switchRole(roleId: Int) {
         viewModelScope.launch {

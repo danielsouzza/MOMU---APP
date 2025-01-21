@@ -1,25 +1,35 @@
+// Arquivo: RoleSelectionScreen.kt
 package com.joaobembe.momu.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,13 +37,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.joaobembe.momu.data.api.TokenManager
+import com.joaobembe.momu.R
 import com.joaobembe.momu.viewmodel.RoleViewModel
 import com.joaobembe.momu.viewmodel.RolesState
-
 
 @Composable
 fun RoleSelectionOrAssessmentListScreen(
@@ -42,48 +53,75 @@ fun RoleSelectionOrAssessmentListScreen(
 ) {
     val rolesState by viewModel.rolesState.collectAsState()
 
-    Column(
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(16.dp), // Ajustando o padding geral
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .fillMaxSize()
+            .background(Color(0xFFB3E1FF)),
+        contentAlignment = Alignment.Center
     ) {
-        if (rolesState.roles?.isNotEmpty() == true) {
-            if (rolesState.roles?.size == 1) {
-                rolesState.roles?.first()?.let { viewModel.switchRole(it.id) }
-                navController.navigate("assessmentList")
-            } else {
-                rolesState.let {
-                    RoleSelectionCard(it) { selectedRoleId ->
-                        viewModel.switchRole(selectedRoleId)
-                        navController.navigate("assessmentList")
+        BackgroundImageRole()
+
+        if (rolesState.isLoading) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        } else {
+            when {
+                rolesState.roles.isNullOrEmpty() -> {
+                    navController.navigate("login") {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+                rolesState.roles?.size == 1 -> {
+                    rolesState.roles?.first().let { role ->
+                        viewModel.switchRole(role!!.id)
+                    }
+                    navController.navigate("assessmentList")
+                }
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .imePadding()
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        RoleSelectionCard(
+                            rolesState = rolesState,
+                            onRoleSelected = { selectedRoleId ->
+                                viewModel.switchRole(selectedRoleId)
+                                navController.navigate("assessmentList")
+                            },
+                            navController = navController
+                        )
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp)) // Espaço entre o card e o botão de voltar
-
-        Button(
-            onClick = {
-                navController.navigate("login")
-                TokenManager.clearToken()
-                      },
-            modifier = Modifier.align(Alignment.CenterHorizontally) // Centraliza o botão
-        ) {
-            Text("Voltar para Login")
         }
     }
 }
 
 @Composable
-fun RoleSelectionCard(rolesState: RolesState, onRoleSelected: (Int) -> Unit) {
+fun BackgroundImageRole() {
+    Image(
+        painter = painterResource(id = R.drawable.bg_login),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = Modifier.fillMaxSize()
+    )
+}
 
+@Composable
+fun RoleSelectionCard(
+    rolesState: RolesState,
+    onRoleSelected: (Int) -> Unit,
+    navController: NavController
+) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(0.8f) // Define a largura do card para 80% da tela
+            .width(500.dp)
+            .height(500.dp)
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.elevatedCardElevation(8.dp)
@@ -93,31 +131,45 @@ fun RoleSelectionCard(rolesState: RolesState, onRoleSelected: (Int) -> Unit) {
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    modifier = Modifier.align(Alignment.Center),
-                    tint = Color.White
-                )
+                ProfileIcon()
+
+                Row (
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(
+                        onClick = {
+                            navController.navigate("login") {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = true
+                                }
+                            }
+                        },
+                    ) {
+                        Text("Sair")
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             rolesState.user?.let {
                 Text(
-                    text = it.name, // Substitua pelo nome real
+                    text = it.name,
                     style = MaterialTheme.typography.titleMedium
                 )
-            }
-            rolesState.user?.let {
                 Text(
-                    text = it.email, // Substitua pelo e-mail real
+                    text = it.email,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -128,14 +180,42 @@ fun RoleSelectionCard(rolesState: RolesState, onRoleSelected: (Int) -> Unit) {
                 text = "Selecionar perfil",
                 style = MaterialTheme.typography.bodyMedium
             )
+
             rolesState.roles?.forEach { role ->
-                Button(
-                    onClick = { onRoleSelected(role.id) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-                ) {
-                    Text(role.name)
+                RoleButton(role.name) {
+                    onRoleSelected(role.id)
                 }
             }
         }
+    }
+}
+
+
+@Composable
+fun ProfileIcon() {
+    Box(
+        modifier = Modifier
+            .size(80.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.secondary),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = null,
+            tint = Color.White
+        )
+    }
+}
+
+@Composable
+fun RoleButton(roleName: String, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(roleName)
     }
 }

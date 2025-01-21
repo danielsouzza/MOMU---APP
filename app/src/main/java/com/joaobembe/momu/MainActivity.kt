@@ -5,11 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -40,9 +35,9 @@ class MainActivity : ComponentActivity() {
 
                 NavHost(navController = navController, startDestination = startDestination) {
                     composable("login") {
-                        LoginScreen(loginViewModel){
+                        LoginScreen(loginViewModel, onLoginSuccess = {
                             navController.navigate("home")
-                        }
+                        })
                     }
                     composable("home") {
                         val roleViewModel = RoleViewModel(ApiService)
