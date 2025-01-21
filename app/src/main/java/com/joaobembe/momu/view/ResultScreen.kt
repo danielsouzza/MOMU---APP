@@ -13,10 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,23 +24,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.joaobembe.momu.data.models.ResultResponse
 import com.joaobembe.momu.viewmodel.AssessmentDetailState
@@ -60,8 +57,6 @@ import network.chaintech.cmpcharts.ui.radarchart.config.RadarChartConfig
 import network.chaintech.cmpcharts.ui.radarchart.config.RadarChartDataSet
 import network.chaintech.cmpcharts.ui.radarchart.config.RadarChartDataSetStyle
 import network.chaintech.cmpcharts.ui.radarchart.config.RadarChartLineStyle
-import kotlin.random.Random
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,11 +79,15 @@ fun ResultScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar"
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = Color.White,
+                )
             )
         }
     ) { paddingValues ->
@@ -101,19 +100,16 @@ fun ResultScreen(
             Log.d("UI", "Recomposing Box")
             when (val state = assessmentDetailState) {
                 is AssessmentDetailState.Loading -> {
-                    //Log.d("UI", "Rendering Loading state")
                     LoadingScreen()
                 }
 
                 is AssessmentDetailState.Success -> {
-                    //Log.d("UI", "Rendering Success state with data: ${state.assessment}")
                     state.assessment?.let { result ->
-                        SuccessScreen(result) {}
+                        SuccessScreen(result)
                     }
                 }
 
                 is AssessmentDetailState.Error -> {
-                    //Log.d("UI", "Rendering Error state")
                     ErrorScreen("Erro ao carregar detalhes") { }
                 }
             }
@@ -147,12 +143,7 @@ fun getBarChartData(
         list.add(
             BarData(
                 point = point,
-                color = Color(
-                    red = Random.nextFloat(),
-                    green = Random.nextFloat(),
-                    blue = Random.nextFloat(),
-                    alpha = 1f
-                ),
+                color = Color.Blue,
                 label = labelList[index],
             )
         )
@@ -181,17 +172,14 @@ fun LoadingScreen() {
 }
 
 @Composable
-fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
+fun SuccessScreen(assessment: ResultResponse?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
-        //verticalArrangement = Arrangement.Center,
-        //horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         assessment?.let {
-            Log.d("UI", "Rendering Success state with data: $it")
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -203,7 +191,7 @@ fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(top = 8.dp)
+                        .padding(top = 8.dp, bottom = 8.dp)
                 )
                 RadarChart(
                     modifier = Modifier
@@ -273,13 +261,10 @@ fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
             val xAxisData = AxisProperties(
                 stepCount = 10,
                 labelColor = Color.Black,
-                lineColor = Color.White,
+                lineColor = Color.Transparent,
                 config = AxisConfiguration(
                     isLineVisible = true,
-                ),
-                labelFormatter = { index ->
-                    (index * 10).toString()
-                }
+                )
             )
 
 
@@ -287,22 +272,44 @@ fun SuccessScreen(assessment: ResultResponse?, onBack: () -> Unit) {
                 chartData = barData,
                 yAxisData = yAxisData,
                 xAxisData = xAxisData,
+                backgroundColor = Color.Transparent,
+                horizontalExtraSpace = 20.dp,
+                barChartType = BarChartType.HORIZONTAL,
                 barStyle = BarChartStyle(
-                    isGradientEnabled = false,
-                    paddingBetweenBars = 10.dp,
                     barWidth = 35.dp,
                 ),
-                horizontalExtraSpace = 20.dp,
-                barChartType = BarChartType.HORIZONTAL
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            BarChart(
-                modifier = Modifier.height(350.dp),
-                barChartData = barChartData
-            )
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.5f)
+                    .padding(16.dp),
+            ) {
+                Text(
+                    text = "Desenvolvimento do nível de maturidade",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
+                )
 
+                BarChart(
+                    modifier = Modifier
+                        .height(460.dp),
+                    barChartData = barChartData
+                )
+
+                Text(
+                    text = "",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 8.dp)
+                )
+            }
         } ?: run {
             Text(text = "Nenhum resultado disponível")
         }

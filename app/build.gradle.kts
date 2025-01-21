@@ -14,7 +14,7 @@ android {
         applicationId = "com.joaobembe.momu"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
+        versionCode = 4
         versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -63,11 +63,11 @@ dependencies {
     implementation(platform(libs.okhttp.bom))
 
     //CMP Charts
-    implementation("network.chaintech:cmpcharts:2.0.2")
+    implementation(libs.cmpcharts)
 
-    implementation( "androidx.room:room-runtime:2.6.1")
-    implementation ("androidx.room:room-ktx:2.5.2")
-    ksp ("androidx.room:room-compiler:2.6.1")
+    implementation( libs.androidx.room.runtime)
+    implementation (libs.androidx.room.ktx)
+    ksp (libs.androidx.room.compiler)
 
 
     implementation(libs.androidx.core.ktx)

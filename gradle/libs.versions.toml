@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+cmpcharts = "2.0.2"
 converterMoshi = "2.9.0"
 hiltAndroid = "2.49"
 hiltNavigationCompose = "1.2.0"
@@ -15,11 +16,16 @@ lifecycleViewmodelCompose = "2.8.7"
 okhttpBom = "4.11.0"
 retrofit = "2.9.0"
 navigationCompose = "2.8.5"
+roomRuntime = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+cmpcharts = { module = "network.chaintech:cmpcharts", version.ref = "cmpcharts" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterMoshi" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
